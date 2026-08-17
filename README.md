@@ -103,6 +103,27 @@ b441e9830364ccd4c15862e4e1cb8bf3  wrapper output
 b441e9830364ccd4c15862e4e1cb8bf3  manual tonemap_vaapi
 ```
 
+## Staying up to date
+
+Prebuilt images are published to GitHub Container Registry and **rebuilt daily**:
+
+```
+ghcr.io/sparxx947/plex-vaapi-tonemap:latest               # based on binhex/arch-plex
+ghcr.io/sparxx947/plex-vaapi-tonemap:latest-linuxserver   # based on linuxserver/plex
+```
+
+Because the image is built `FROM` the upstream Plex image, each nightly rebuild
+picks up whatever Plex version upstream currently ships. Pulling the image is
+therefore the same as updating Plex — your normal container update routine keeps
+working, no special handling required.
+
+Every build verifies that the wrapper is actually in place before the tag is
+considered good: the original binary must exist as `.orig`, the replacement must
+be the wrapper script, and it must contain the rewrite rule. A broken build
+fails instead of quietly shipping a Plex without the fix.
+
+If you build locally instead, rebuild whenever you would otherwise update Plex.
+
 ## Limitations
 
 * `tonemap_vaapi` uses Intel's fixed-function LUT. It has no tunable algorithm,

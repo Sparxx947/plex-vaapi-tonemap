@@ -105,6 +105,29 @@ b441e9830364ccd4c15862e4e1cb8bf3  Ausgabe des Wrappers
 b441e9830364ccd4c15862e4e1cb8bf3  manuelles tonemap_vaapi
 ```
 
+## Aktuell bleiben
+
+Fertige Images liegen in der GitHub Container Registry und werden **täglich neu
+gebaut**:
+
+```
+ghcr.io/sparxx947/plex-vaapi-tonemap:latest               # auf Basis binhex/arch-plex
+ghcr.io/sparxx947/plex-vaapi-tonemap:latest-linuxserver   # auf Basis linuxserver/plex
+```
+
+Da das Image `FROM` dem Upstream-Plex-Image gebaut wird, übernimmt jeder
+nächtliche Neubau die Plex-Fassung, die Upstream gerade ausliefert. Das Image zu
+ziehen ist damit gleichbedeutend mit einem Plex-Update — die gewohnte
+Container-Aktualisierung greift unverändert weiter, es ist nichts Zusätzliches
+nötig.
+
+Jeder Build prüft vor der Freigabe, dass der Wrapper wirklich sitzt: Das
+Original muss als `.orig` vorhanden sein, an seiner Stelle das Wrapper-Skript
+stehen, und dieses muss die Umschreiberegel enthalten. Ein fehlgeschlagener Bau
+bricht ab, statt stillschweigend ein Plex ohne die Reparatur auszuliefern.
+
+Wer lokal baut, baut immer dann neu, wenn er sonst Plex aktualisieren würde.
+
 ## Grenzen
 
 * `tonemap_vaapi` nutzt Intels Fixed-Function-LUT und kennt keinen einstellbaren
