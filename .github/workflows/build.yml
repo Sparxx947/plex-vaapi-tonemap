@@ -18,7 +18,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -37,6 +36,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # GHCR only accepts lowercase repository paths, github.repository keeps
+      # the owner's original casing.
+      - name: Derive lowercase image name
+        run: echo "IMAGE_PATH=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
       - name: Log in to registry
         uses: docker/login-action@v3
         with:
@@ -50,16 +54,16 @@ jobs:
           context: .
           push: true
           build-args: BASE_IMAGE=${{ matrix.base }}
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest${{ matrix.suffix }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PATH }}:latest${{ matrix.suffix }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=Plex with VAAPI tone mapping instead of OpenCL (base ${{ matrix.base }})
 
       - name: Verify the wrapper is in place
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest${{ matrix.suffix }}
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_PATH }}:latest${{ matrix.suffix }}
           docker run --rm --entrypoint /bin/sh \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest${{ matrix.suffix }} -c '
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PATH }}:latest${{ matrix.suffix }} -c '
               set -e
               T="/usr/lib/plexmediaserver/Plex Transcoder"
               test -f "$T.orig" || { echo "original binary missing"; exit 1; }
